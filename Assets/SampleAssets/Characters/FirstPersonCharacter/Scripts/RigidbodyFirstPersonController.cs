@@ -103,8 +103,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
             GroundCheck();
             Vector2 input = GetInput();
 
-            if ((input.x != 0 || input.y != 0) && (advancedSettings.airControl || isGrounded))
-            {
+           // if ((input.x != 0 || input.y != 0) && (advancedSettings.airControl || isGrounded))
+            //{
                 // always move along the camera forward as it is the direction that it being aimed at
                 Vector3 desiredMove = _camera.transform.forward*input.y + _camera.transform.right*input.x;
                 desiredMove = (desiredMove - Vector3.Project(desiredMove, groundContactNormal)).normalized;
@@ -117,16 +117,14 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 {
                     RigidBody.AddForce(desiredMove*SlopeMultiplier(), ForceMode.Impulse);
                 }
-            }
+//            }
 
             if (isGrounded)
             {
                 RigidBody.drag = 5f;
 
-                if (jump)
-                {
-                    doJump();
-                }
+                //StartCoroutine(doJump());
+                doJump();
 
                 if (!jumping && input.x == 0f && input.y == 0f && RigidBody.velocity.magnitude < 1f)
                 {
@@ -144,12 +142,17 @@ namespace UnitySampleAssets.Characters.FirstPerson
             jump = false;
         }
 
-        private void doJump()
+        void doJump()
         {
-            RigidBody.drag = 0f;
-            RigidBody.velocity = new Vector3(RigidBody.velocity.x, 0f, RigidBody.velocity.z);
-            RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
-            jumping = true;
+            if (isMoving)
+            {
+                Debug.Log("doJump - jumping...");
+                RigidBody.drag = 0f;
+                RigidBody.velocity = new Vector3(RigidBody.velocity.x, 0f, RigidBody.velocity.z);
+                RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
+                jumping = true;
+              //  yield return new WaitForSeconds(2f);
+            }
         }
 
         private float SlopeMultiplier()

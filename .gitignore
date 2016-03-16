@@ -9,3 +9,5 @@ First_Person_in_Mars.CSharp.Editor.csproj
 First_Person_in_Mars.CSharp.csproj
 First_Person_in_Mars.sln
 *.apk
+*.csproj
+*.sln
