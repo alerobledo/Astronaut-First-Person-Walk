@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-namespace UnitySampleAssets.ImageEffects
+namespace UnityStandardAssets.ImageEffects
 {
     [RequireComponent(typeof (Camera))]
     [AddComponentMenu("")]
@@ -11,6 +12,7 @@ namespace UnitySampleAssets.ImageEffects
         public Shader shader;
 
         private Material m_Material;
+
 
         protected virtual void Start()
         {
@@ -27,6 +29,7 @@ namespace UnitySampleAssets.ImageEffects
                 enabled = false;
         }
 
+
         protected Material material
         {
             get
@@ -39,6 +42,7 @@ namespace UnitySampleAssets.ImageEffects
                 return m_Material;
             }
         }
+
 
         protected virtual void OnDisable()
         {
