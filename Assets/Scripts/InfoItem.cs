@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Spin : MonoBehaviour {
+public class InfoItem : MonoBehaviour {
 
     public float speed = 10f;
 
@@ -14,4 +14,12 @@ public class Spin : MonoBehaviour {
 	void Update () {
         transform.Rotate(Vector3.up, speed * Time.deltaTime);
     }
+
+    void OnCollisionEnter(Collision col) {
+        if (col.gameObject.tag == "Player") {
+            Destroy(col.gameObject);
+            InfoScreen.Instance.DisplayScreen();
+        }
+    }
+
 }
