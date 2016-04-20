@@ -5,12 +5,22 @@ public class InfoScreen : MonoBehaviour {
 
     public static InfoScreen Instance { get; set; }
 
-    public Texture2D[] Images;
+    public Sprite[] Images;
 
     public GameObject InfoScreenPanel;
+    public GameObject InfoScreenImage;
+
+    private UnityEngine.UI.Image imageComponent;
+    private System.Random rnd = new System.Random();
 
     public void DisplayScreen() {
-        InfoScreenPanel.SetActive(true);
+
+        if (imageComponent != null) {
+            imageComponent.sprite = Images[rnd.Next(0, Images.Length - 1)];
+            InfoScreenPanel.SetActive(true);
+        }
+            
+
     }
 
     public void HideScreen() {
@@ -20,10 +30,15 @@ public class InfoScreen : MonoBehaviour {
     // Use this for initialization
     void Start () {
         InfoScreen.Instance = this;
+
+        imageComponent = InfoScreenImage.GetComponent< UnityEngine.UI.Image >();
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
-	
+        if (Input.anyKeyDown) {
+            HideScreen();
+        }
 	}
 }

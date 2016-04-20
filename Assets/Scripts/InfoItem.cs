@@ -15,9 +15,9 @@ public class InfoItem : MonoBehaviour {
         transform.Rotate(Vector3.up, speed * Time.deltaTime);
     }
 
-    void OnCollisionEnter(Collision col) {
+
+    void OnTriggerEnter(Collider col) {
         if (col.gameObject.tag == "Player") {
-            Destroy(col.gameObject);
             InfoScreen.Instance.DisplayScreen();
         }
     }
