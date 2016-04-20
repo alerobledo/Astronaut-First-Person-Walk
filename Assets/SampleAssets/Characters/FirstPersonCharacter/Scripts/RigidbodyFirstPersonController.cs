@@ -3,10 +3,14 @@ using UnitySampleAssets.CrossPlatformInput;
 
 namespace UnitySampleAssets.Characters.FirstPerson
 {
-    [RequireComponent(typeof (Rigidbody))]
-    [RequireComponent(typeof (CapsuleCollider))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(CapsuleCollider))]
     public class RigidbodyFirstPersonController : MonoBehaviour
     {
+        private const float MAX_HEIGHT = 25f;
+
+        private int fuel = 3000;
+
         [System.Serializable]
         public class MovementSettings
         {
@@ -90,41 +94,94 @@ namespace UnitySampleAssets.Characters.FirstPerson
         private void Update()
         {
             RotateView();
-
-            if (CrossPlatformInputManager.GetButtonDown("Jump") && !jump)
-            {
-                jump = true;
-            }
         }
+
+        bool isFlying = false;
 
 
         private void FixedUpdate()
         {
+            //fly
+            float y = RigidBody.velocity.y;
+            if (isFlying)
+            {
+                y = validateMaxFlyHeight(y);
+                //fuel -= 10;
+            }
+
+            if ( Input.GetKey("joystick button 15") && fuel >= 0)
+            {
+                fixedUpdateFly(y);
+            }
+            else
+            {
+                isFlying = false;
+                RigidBody.drag = 0.25f;
+            }
+            //fly end
+
+
+            if (!isFlying)
+            {
+                fixedUpdateWalk();
+            }
+
+        }
+
+        private float validateMaxFlyHeight(float y)
+        {
+            if (y >= MAX_HEIGHT)
+            {
+                y = 0f;
+            }
+            else
+            {
+                y = _camera.transform.forward.y + 1;
+            }
+
+            return y;
+        }
+
+        private void fixedUpdateFly(float y)
+        {
+            isFlying = true;
+            float forceStrength = 30f;
+            Vector3 direction = new Vector3(_camera.transform.forward.x, y, _camera.transform.forward.z).normalized;
+            Quaternion rotation = Quaternion.Euler(new Vector3(0, -transform.rotation.eulerAngles.y, 0));
+
+            Vector3 move = rotation * direction;
+
+            RigidBody.AddForce(move * forceStrength, ForceMode.Impulse);
+        }
+
+        private void fixedUpdateWalk()
+        {
             GroundCheck();
-            Vector2 input = GetInput();
 
-           // if ((input.x != 0 || input.y != 0) && (advancedSettings.airControl || isGrounded))
+            movementSettings.UpdateDesiredTargetSpeed();
+            Vector2 input = getInput();
+
+            // if ((input.x != 0 || input.y != 0) && (advancedSettings.airControl || isGrounded))
             //{
-                // always move along the camera forward as it is the direction that it being aimed at
-                Vector3 desiredMove = _camera.transform.forward*input.y + _camera.transform.right*input.x;
-                desiredMove = (desiredMove - Vector3.Project(desiredMove, groundContactNormal)).normalized;
+            // always move along the camera forward as it is the direction that it being aimed at
+            Vector3 desiredMove = _camera.transform.forward * input.y + _camera.transform.right * input.x;
+            desiredMove = (desiredMove - Vector3.Project(desiredMove, groundContactNormal)).normalized;
 
-                desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
-                desiredMove.z = desiredMove.z*movementSettings.CurrentTargetSpeed;
-                desiredMove.y = desiredMove.y*movementSettings.CurrentTargetSpeed;
-                if (RigidBody.velocity.sqrMagnitude <
-                    (movementSettings.CurrentTargetSpeed*movementSettings.CurrentTargetSpeed))
-                {
-                    RigidBody.AddForce(desiredMove*SlopeMultiplier(), ForceMode.Impulse);
-                }
-//            }
+            desiredMove.x = desiredMove.x * movementSettings.CurrentTargetSpeed;
+            desiredMove.z = desiredMove.z * movementSettings.CurrentTargetSpeed;
+            desiredMove.y = desiredMove.y * movementSettings.CurrentTargetSpeed;
+            if (RigidBody.velocity.sqrMagnitude <
+                (movementSettings.CurrentTargetSpeed * movementSettings.CurrentTargetSpeed))
+            {
+                RigidBody.AddForce(desiredMove * SlopeMultiplier(), ForceMode.Impulse);
+            }
+            //            }
 
             if (isGrounded)
             {
                 RigidBody.drag = 5f;
 
-                //StartCoroutine(doJump());
-                doJump();
+                doJump(desiredMove.x, desiredMove.z);
 
                 if (!jumping && input.x == 0f && input.y == 0f && RigidBody.velocity.magnitude < 1f)
                 {
@@ -142,16 +199,60 @@ namespace UnitySampleAssets.Characters.FirstPerson
             jump = false;
         }
 
-        void doJump()
+        private Vector2 getInput()
+        {
+            float x, y;
+            if (Input.GetMouseButton(0))
+            {
+                x = 0;
+                y = 1;
+            }
+            else {
+                x = Input.GetAxis("Horizontal");
+                y = Input.GetAxis("Vertical");
+            }
+
+            if((Mathf.Abs(x) > float.Epsilon || Mathf.Abs(y) > float.Epsilon))
+            {
+                isMoving = true;
+            }
+            else
+            {
+                isMoving = false;
+            }
+
+            Vector2 input = new Vector2(x, y);
+            return input;
+        }
+        /*
+        private Vector2 getInput()
+        {
+            Vector2 input = new Vector2(0, 0);
+
+            if (Cardboard.SDK.Triggered)
+            {
+                isMoving = !isMoving;
+            }
+
+            if (isMoving)
+            {
+                input = new Vector2(0, 2);
+            }
+
+            return input;
+        }
+        */
+        void doJump(float x, float z)
         {
             if (isMoving)
             {
-                Debug.Log("doJump - jumping...");
                 RigidBody.drag = 0f;
-                RigidBody.velocity = new Vector3(RigidBody.velocity.x, 0f, RigidBody.velocity.z);
+                //RigidBody.velocity = new Vector3(RigidBody.velocity.x, 0f, RigidBody.velocity.z);
+                RigidBody.velocity = new Vector3(x, 0f, z);
                 RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
+                //RigidBody.AddForce(new Vector3(x, movementSettings.JumpForce, z), ForceMode.Impulse);
                 jumping = true;
-              //  yield return new WaitForSeconds(2f);
+                //  yield return new WaitForSeconds(2f);
             }
         }
 
@@ -166,7 +267,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
         {
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position, Capsule.radius, Vector3.down, out hitInfo,
-                                   ((Capsule.height/2f) - Capsule.radius) +
+                                   ((Capsule.height / 2f) - Capsule.radius) +
                                    advancedSettings.stickToGroundHelperDistance))
             {
                 if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
@@ -177,31 +278,6 @@ namespace UnitySampleAssets.Characters.FirstPerson
         }
 
         bool isMoving = false;
-
-        private Vector2 GetInput()
-        {
-            movementSettings.UpdateDesiredTargetSpeed();
-            Vector2 input = new Vector2(0, 0);
-
-            if (Cardboard.SDK.Triggered)
-            {
-                isMoving = !isMoving;
-            }
-
-            if (isMoving)
-            {
-                input = new Vector2(0,2);
-            }
-            /*Vector2 input = new Vector2
-                {
-                    x = CrossPlatformInputManager.GetAxis("Horizontal"),
-                    y = CrossPlatformInputManager.GetAxis("Vertical")
-                };
-                */
-            Debug.Log("GetInput() - input:"+input+ "   - isMoving:"+ isMoving);
-            return input;
-        }
-
 
         private void RotateView()
         {
@@ -218,7 +294,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             {
                 // Rotate the rigidbody velocity to match the new direction that the character is looking 
                 Quaternion velRotation = Quaternion.AngleAxis(transform.eulerAngles.y - oldYRotation, Vector3.up);
-                RigidBody.velocity = velRotation*RigidBody.velocity;
+                RigidBody.velocity = velRotation * RigidBody.velocity;
             }
         }
 
@@ -229,7 +305,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             previouslyGrounded = isGrounded;
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position, Capsule.radius, Vector3.down, out hitInfo,
-                                   ((Capsule.height/2f) - Capsule.radius) + advancedSettings.groundCheckDistance))
+                                   ((Capsule.height / 2f) - Capsule.radius) + advancedSettings.groundCheckDistance))
             {
                 isGrounded = true;
                 groundContactNormal = hitInfo.normal;
@@ -243,6 +319,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             {
                 jumping = false;
             }
+            print("FPC - GroundCheck - isGrounded:"+ isGrounded);
         }
     }
 }
