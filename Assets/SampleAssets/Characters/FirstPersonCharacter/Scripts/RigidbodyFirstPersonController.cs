@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnitySampleAssets.CrossPlatformInput;
 
 namespace UnitySampleAssets.Characters.FirstPerson
@@ -201,16 +202,14 @@ namespace UnitySampleAssets.Characters.FirstPerson
 
         private Vector2 getInput()
         {
-            float x, y;
-            if (Input.GetMouseButton(0))
+            if (Cardboard.SDK.Triggered)
             {
-                x = 0;
-                y = 1;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
-            else {
-                x = Input.GetAxis("Horizontal");
-                y = Input.GetAxis("Vertical");
-            }
+
+            float x, y;
+            x = Input.GetAxis("Horizontal");
+            y = Input.GetAxis("Vertical");
 
             if((Mathf.Abs(x) > float.Epsilon || Mathf.Abs(y) > float.Epsilon))
             {
@@ -224,24 +223,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             Vector2 input = new Vector2(x, y);
             return input;
         }
-        /*
-        private Vector2 getInput()
-        {
-            Vector2 input = new Vector2(0, 0);
 
-            if (Cardboard.SDK.Triggered)
-            {
-                isMoving = !isMoving;
-            }
-
-            if (isMoving)
-            {
-                input = new Vector2(0, 2);
-            }
-
-            return input;
-        }
-        */
         void doJump(float x, float z)
         {
             if (isMoving)
@@ -250,9 +232,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 //RigidBody.velocity = new Vector3(RigidBody.velocity.x, 0f, RigidBody.velocity.z);
                 RigidBody.velocity = new Vector3(x, 0f, z);
                 RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
-                //RigidBody.AddForce(new Vector3(x, movementSettings.JumpForce, z), ForceMode.Impulse);
                 jumping = true;
-                //  yield return new WaitForSeconds(2f);
             }
         }
 
