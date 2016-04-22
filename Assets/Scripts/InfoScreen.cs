@@ -8,15 +8,19 @@ public class InfoScreen : MonoBehaviour {
     public Sprite[] Images;
 
     public GameObject InfoScreenPanel;
-    public GameObject InfoScreenImage;
+    public GameObject InfoScreenImageL;
+    public GameObject InfoScreenImageR;
 
-    private UnityEngine.UI.Image imageComponent;
+    private UnityEngine.UI.Image imageComponentL;
+    private UnityEngine.UI.Image imageComponentR;
     private System.Random rnd = new System.Random();
 
     public void DisplayScreen() {
 
-        if (imageComponent != null) {
-            imageComponent.sprite = Images[rnd.Next(0, Images.Length - 1)];
+        if (imageComponentL != null && imageComponentR != null) {
+            int imgIndex = rnd.Next(0, Images.Length - 1);
+            imageComponentL.sprite = Images[imgIndex];
+            imageComponentR.sprite = Images[imgIndex];
             InfoScreenPanel.SetActive(true);
         }
             
@@ -31,8 +35,9 @@ public class InfoScreen : MonoBehaviour {
     void Start () {
         InfoScreen.Instance = this;
 
-        imageComponent = InfoScreenImage.GetComponent< UnityEngine.UI.Image >();
-        
+        imageComponentL = InfoScreenImageL.GetComponent< UnityEngine.UI.Image >();
+        imageComponentR = InfoScreenImageR.GetComponent<UnityEngine.UI.Image>();
+
     }
 	
 	// Update is called once per frame
