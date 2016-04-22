@@ -8,7 +8,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
     [RequireComponent(typeof(CapsuleCollider))]
     public class RigidbodyFirstPersonController : MonoBehaviour
     {
-        private const float MAX_HEIGHT = 25f;
+        private const float MAX_HEIGHT = 50f;
 
         private const int FUEL_TANK = 3000;
 
@@ -129,7 +129,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
         private void FixedUpdate()
         {
             //tests joystick input
-            for (int i = 0; i < 20; i++)
+           /* for (int i = 0; i < 20; i++)
             {
 
                 if (Input.GetKeyDown("joystick button " + i.ToString()))
@@ -142,17 +142,18 @@ namespace UnitySampleAssets.Characters.FirstPerson
             if (Input.GetAxis("Horizontal") != 0.0f || Input.GetAxis("Vertical") != 0.0f)
             {
                 Debug.Log("Joystick X: " + Input.GetAxis("Horizontal") + " Y: " + Input.GetAxis("Vertical"));
-            }
+            }*/
             //test
 
 
             //fly
-            float y = RigidBody.velocity.y;
+            float y = transform.position.y;
             if (isFlying)
             {
+                RigidBody.drag = 5f;
                 y = validateMaxFlyHeight(y);
                 fuel -= 10;
-                print("fuel percent:" + getFuelPercent());
+               // print("fuel percent:" + getFuelPercent());
             }
 
             if ((Input.GetKey("joystick 1 button 15") 
@@ -185,14 +186,15 @@ namespace UnitySampleAssets.Characters.FirstPerson
             {
                 y = _camera.transform.forward.y + 1;
             }
-
+            print("_camera.transform.forward.y:" + _camera.transform.forward.y);
             return y;
         }
 
         private void fixedUpdateFly(float y)
         {
+            //print("fixedUpdateFly - enter - y:"+y);
             isFlying = true;
-            float forceStrength = 30f;
+            float forceStrength = 20f;
             Vector3 direction = new Vector3(_camera.transform.forward.x, y, _camera.transform.forward.z).normalized;
             Quaternion rotation = Quaternion.Euler(new Vector3(0, -transform.rotation.eulerAngles.y, 0));
 
@@ -208,8 +210,6 @@ namespace UnitySampleAssets.Characters.FirstPerson
             movementSettings.UpdateDesiredTargetSpeed();
             Vector2 input = getInput();
 
-            // if ((input.x != 0 || input.y != 0) && (advancedSettings.airControl || isGrounded))
-            //{
             // always move along the camera forward as it is the direction that it being aimed at
             Vector3 desiredMove = _camera.transform.forward * input.y + _camera.transform.right * input.x;
             desiredMove = (desiredMove - Vector3.Project(desiredMove, groundContactNormal)).normalized;
@@ -222,7 +222,6 @@ namespace UnitySampleAssets.Characters.FirstPerson
             {
                 RigidBody.AddForce(desiredMove * SlopeMultiplier(), ForceMode.Impulse);
             }
-            //            }
 
             if (isGrounded)
             {
