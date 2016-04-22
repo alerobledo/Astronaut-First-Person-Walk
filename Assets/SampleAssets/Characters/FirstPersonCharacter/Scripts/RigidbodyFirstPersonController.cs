@@ -10,7 +10,10 @@ namespace UnitySampleAssets.Characters.FirstPerson
     {
         private const float MAX_HEIGHT = 25f;
 
-        private int fuel = 3000;
+        private const int FUEL_TANK = 3000;
+
+        private int fuel;
+        
 
         [System.Serializable]
         public class MovementSettings
@@ -86,10 +89,32 @@ namespace UnitySampleAssets.Characters.FirstPerson
         }
 
 
+        public int getFuelPercent()
+        {
+            float percent = fuel * 100 / FUEL_TANK;
+            return Mathf.CeilToInt(percent);
+        }
+
+        public void chargeFuel(int fuelCharge)
+        {
+            if (fuel < FUEL_TANK)
+            {
+                if (FUEL_TANK - fuel > fuelCharge)
+                {
+                    fuel += fuelCharge;
+                }
+                else
+                {
+                    fuel = FUEL_TANK;
+                }
+            }
+        }
+
         private void Start()
         {
             RigidBody = GetComponent<Rigidbody>();
             Capsule = GetComponent<CapsuleCollider>();
+            fuel = FUEL_TANK;
         }
 
 
@@ -126,7 +151,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
             if (isFlying)
             {
                 y = validateMaxFlyHeight(y);
-                //fuel -= 10;
+                fuel -= 10;
+                print("fuel percent:" + getFuelPercent());
             }
 
             if ((Input.GetKey("joystick 1 button 15") 
