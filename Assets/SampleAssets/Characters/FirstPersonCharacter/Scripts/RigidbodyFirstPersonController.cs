@@ -10,7 +10,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
     {
         private const float MAX_HEIGHT = 50f;
 
-        private const int FUEL_TANK = 3000;
+        private const int FUEL_TANK = 5000;
 
         private int fuel;
         
@@ -92,7 +92,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
         public int getFuelPercent()
         {
             float percent = fuel * 100 / FUEL_TANK;
-            return Mathf.CeilToInt(percent);
+            return Mathf.CeilToInt(percent/10);
         }
 
         public void chargeFuel(int fuelCharge)
@@ -153,7 +153,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 RigidBody.drag = 5f;
                 y = validateMaxFlyHeight(y);
                 fuel -= 10;
-               // print("fuel percent:" + getFuelPercent());
+                //print("fuel percent:" + getFuelPercent());
             }
 
             if ((Input.GetKey("joystick 1 button 15") 
