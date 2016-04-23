@@ -22,8 +22,8 @@ public class FuelItem : MonoBehaviour {
 
 
     void OnTriggerEnter(Collider col) {
-        if (col.gameObject.tag == "Player") {
-            playerComponent.chargeFuel(1000);
+        if (col.gameObject.tag == "Player" && playerComponent.getFuelPercent()<10) {
+            playerComponent.chargeFuel(10000);
             print("Destroying fuel");
             Destroy(this.gameObject);
         }

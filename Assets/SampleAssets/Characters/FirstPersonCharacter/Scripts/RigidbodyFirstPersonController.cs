@@ -8,9 +8,9 @@ namespace UnitySampleAssets.Characters.FirstPerson
     [RequireComponent(typeof(CapsuleCollider))]
     public class RigidbodyFirstPersonController : MonoBehaviour
     {
-        private const float MAX_HEIGHT = 50f;
+        private const float MAX_HEIGHT = 100f;
 
-        private const int FUEL_TANK = 10000;
+        private const int FUEL_TANK = 25000;
 
         private int fuel;
         
