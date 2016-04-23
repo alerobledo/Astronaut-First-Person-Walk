@@ -10,7 +10,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
     {
         private const float MAX_HEIGHT = 50f;
 
-        private const int FUEL_TANK = 5000;
+        private const int FUEL_TANK = 10000;
 
         private int fuel;
         
