@@ -24,7 +24,8 @@ public class FuelItem : MonoBehaviour {
     void OnTriggerEnter(Collider col) {
         if (col.gameObject.tag == "Player") {
             playerComponent.chargeFuel(1000);
-            Destroy(this);
+            print("Destroying fuel");
+            Destroy(this.gameObject);
         }
     }
 

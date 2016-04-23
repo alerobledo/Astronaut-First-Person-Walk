@@ -26,7 +26,7 @@ public class FuelBar : MonoBehaviour {
 	void Update () {
 
         var fuelPercent = playerScript.getFuelPercent();
-        print(fuelPercent);
+//        print(fuelPercent);
         imageComponentL.sprite = images[fuelPercent];
         imageComponentR.sprite = images[fuelPercent];
     }
